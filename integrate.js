@@ -110,7 +110,7 @@ WebApp.getMP3Player = function()
 {
     var mp3Player;
     try {
-        mp3Player = document.getElementById("mp3Player");
+        mp3Player = document.getElementsByClassName("dragonfly")[0];
     } catch (e) {
         mp3Player = document;
     }
@@ -130,14 +130,13 @@ WebApp.update = function()
     var playerRoot = this.getMP3Player();
 
     try {
-        var songDetails = playerRoot.getElementsByClassName("currentSongDetails")[0];
-        track.title = songDetails.getElementsByClassName("title")[0].textContent;
-        track.artist = songDetails.getElementsByClassName("artistLink")[0].textContent;
+        var songDetails = playerRoot.getElementsByClassName("trackInfoContainer")[0];
+        track.title = songDetails.getElementsByClassName("trackTitle")[0].textContent;
+        track.artist = songDetails.getElementsByClassName("trackArtist")[0].getElementsByTagName("span")[0].textContent;
+        track.album = songDetails.getElementsByClassName("trackSourceLink")[0].getElementsByTagName("a")[0].title;
 
-        var albumImage = playerRoot.getElementsByClassName("albumImage")[0];
+        var albumImage = playerRoot.getElementsByClassName("albumArtWrapper")[0].getElementsByTagName("img")[0];
         track.artLocation = albumImage.src;
-        if (track.album === null)
-            track.album = albumImage.title;
     } catch (e) {
         //~ console.log("Failed to get track info");
         //~ console.log(e.message);
