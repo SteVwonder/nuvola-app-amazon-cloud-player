@@ -117,6 +117,52 @@ WebApp.getMP3Player = function()
     return mp3Player;
 }
 
+WebApp.findAncestor = function(el, cls)
+{
+    while ((el = el.parentElement) && !el.classList.contains(cls));
+    if (el != null && el.classList.contains(cls)) {
+        return el;
+    }
+    return null;
+}
+
+WebApp.getFocusedSong = function()
+{
+    var equalizer = document.getElementsByClassName("equalizer PLAYING");
+    if (equalizer.length > 0) {
+        equalizer = equalizer[0];
+    } else {
+        equalizer = document.getElementsByClassName("equalizer PAUSED");
+        if (equalizer.length > 0) {
+            equalizer = equalizer[0];
+        } else {
+            equalizer = null;
+        }
+    }
+
+    if (equalizer != null) {
+        return this.findAncestor(equalizer, "playlistDetailsListItem");
+    }
+
+    return null;
+}
+
+
+WebApp.getAlbumFromCurrPlaylist = function()
+{
+    var focused_song = this.getFocusedSong();
+    if (focused_song != null) {
+        var album_name_link = focused_song.getElementsByClassName("albumName");
+        if (album_name_link.length > 0) {
+            var album_span = album_name_link[0].getElementsByTagName('span');
+            if (album_span.length > 0) {
+                return album_span[0].textContent;
+            }
+        }
+    }
+    return null;
+}
+
 // Extract data from the web page
 WebApp.update = function()
 {
@@ -133,7 +179,11 @@ WebApp.update = function()
         var songDetails = playerRoot.getElementsByClassName("trackInfoContainer")[0];
         track.title = songDetails.getElementsByClassName("trackTitle")[0].textContent;
         track.artist = songDetails.getElementsByClassName("trackArtist")[0].getElementsByTagName("span")[0].textContent;
-        track.album = songDetails.getElementsByClassName("trackSourceLink")[0].getElementsByTagName("a")[0].title;
+
+        track.album = this.getAlbumFromCurrPlaylist();
+        if (track.album == null) {
+            track.album = songDetails.getElementsByClassName("trackSourceLink")[0].getElementsByTagName("a")[0].title;
+        }
 
         var albumImage = playerRoot.getElementsByClassName("albumArtWrapper")[0].getElementsByTagName("img")[0];
         track.artLocation = albumImage.src;
